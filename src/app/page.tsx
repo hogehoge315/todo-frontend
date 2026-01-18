@@ -17,6 +17,10 @@ export default function Home() {
     router.push("/create");
   };
 
+  const goToShowPage = () => {
+    router.push("/show");
+  };
+
   return (
     <Container
       maxW="container.lg"
@@ -28,13 +32,20 @@ export default function Home() {
     >
       <VStack gap={8}>
         <Heading as="h1" size="2xl" textAlign="center">
-          Welcome to the Todo App
+          Todoアプリへようこそ
         </Heading>
         <Text fontSize="xl" textAlign="center">
-          Get started by creating a new todo item.
+          新しいTodoアイテムを作成して始めましょう。
         </Text>
         <Button onClick={goToCreatePage} colorScheme="teal" size="lg">
-          Go to Create Page
+          作成ページへ
+        </Button>
+
+        <Text fontSize="xl" textAlign="center">
+          Todoアイテムを表示します。
+        </Text>
+        <Button onClick={goToShowPage} colorScheme="teal" size="lg">
+          表示ページへ
         </Button>
         <ColorModeButton />
       </VStack>
