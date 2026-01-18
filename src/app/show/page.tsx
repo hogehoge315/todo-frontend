@@ -9,10 +9,12 @@ import {
   Spinner,
   Badge,
   Button,
+  HStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Todo, TodoListResponse } from "@/types/todos";
+import { toaster } from "@/components/ui/toaster";
 
 const ShowPage = () => {
   const router = useRouter();
@@ -24,22 +26,35 @@ const ShowPage = () => {
     router.push("/");
   };
 
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/todos");
-        if (!response.ok) {
-          throw new Error("Failed to fetch todos");
-        }
-        const data: TodoListResponse = await response.json();
-        setTodos(data.items);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
+  const fetchTodos = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("http://localhost:8000/todos");
+      if (!response.ok) {
+        throw new Error("Failed to fetch todos");
       }
-    };
+      const data: TodoListResponse = await response.json();
+      setTodos(data.items);
 
+      // 成功トーストを表示
+      toaster.success({
+        title: "更新完了",
+        description: "Todo一覧を更新しました",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      // 失敗トーストを表示
+      toaster.error({
+        title: "更新失敗",
+        description: "Todo一覧の取得に失敗しました",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTodos();
   }, []);
 
@@ -96,8 +111,13 @@ const ShowPage = () => {
             ))}
           </List.Root>
         )}
-        <Box display="flex" justifyContent="right">
-          <Button onClick={goToPreviousPage}>戻る</Button>
+        <Box display="flex" justifyContent="flex-end">
+          <HStack gap={4}>
+            <Button onClick={goToPreviousPage}>戻る</Button>
+            <Button onClick={fetchTodos} colorPalette="blue" disabled={loading}>
+              {loading ? "更新中..." : "更新"}
+            </Button>
+          </HStack>
         </Box>
       </VStack>
     </Container>
