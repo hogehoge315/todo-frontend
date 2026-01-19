@@ -7,22 +7,14 @@ import {
   Spinner,
   Button,
   HStack,
-  IconButton,
-  Card,
   Box,
-  Input,
 } from "@chakra-ui/react";
 import { useShowPage } from "@/hooks/todos/useShowPage";
 import { useTodoOperations } from "@/hooks/todos/useTodoOperations";
 import { useTodoForm } from "@/hooks/todos/useTodoForm";
-import {
-  FiEdit,
-  FiPlus,
-  FiRotateCw,
-  FiTrash2,
-  FiX,
-  FiCheck,
-} from "react-icons/fi";
+import { NewTodoCard } from "@/components/features/todos/NewTodoCard";
+import { TodoCard } from "@/components/features/todos/TodoCard";
+import { FiPlus, FiRotateCw } from "react-icons/fi";
 
 const ShowPage = () => {
   const { goToPreviousPage } = useShowPage();
@@ -82,80 +74,27 @@ const ShowPage = () => {
         ) : (
           <VStack gap={3}>
             {todos.map((todo) => (
-              <Card.Root key={todo.id} w="full" variant="outline">
-                <Card.Body p={4}>
-                  <HStack w="full" align="center">
-                    <Button
-                      size="xs"
-                      colorPalette={todo.is_done ? "green" : "gray"}
-                      variant="subtle"
-                      onClick={() => toggleTodo(todo.id)}
-                    >
-                      {todo.is_done ? "完了" : "未完了"}
-                    </Button>
-                    <Text
-                      flex="1"
-                      fontSize="lg"
-                      textDecoration={todo.is_done ? "line-through" : "none"}
-                    >
-                      {todo.title}
-                    </Text>
-                    <IconButton
-                      onClick={() => {}}
-                      variant="subtle"
-                      colorPalette="gray"
-                    >
-                      <FiEdit />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => deleteTodo(todo.id)}
-                      variant="plain"
-                      colorPalette="red"
-                      disabled={deletingId === todo.id}
-                      loading={deletingId === todo.id}
-                    >
-                      <FiTrash2 />
-                    </IconButton>
-                  </HStack>
-                </Card.Body>
-              </Card.Root>
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                toggleTodo={toggleTodo}
+                deleteTodo={deleteTodo}
+                deletingId={deletingId}
+              />
             ))}
           </VStack>
         )}
 
         {isAdding && (
-          <Card.Root w="full" variant="outline" colorPalette="green">
-            <Card.Body p={4}>
-              <HStack w="full" align="center">
-                <Input
-                  flex="1"
-                  placeholder="新しいTodoを入力..."
-                  value={newTodoTitle}
-                  onChange={(e) => setNewTodoTitle(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onCompositionStart={() => setIsComposing(true)}
-                  onCompositionEnd={() => setIsComposing(false)}
-                  autoFocus
-                />
-                <IconButton
-                  onClick={handleCancelAdd}
-                  variant="subtle"
-                  colorPalette="gray"
-                >
-                  <FiX />
-                </IconButton>
-                <IconButton
-                  onClick={handleAddTodo}
-                  variant="subtle"
-                  colorPalette="green"
-                  disabled={!newTodoTitle.trim() || isCreating}
-                  loading={isCreating}
-                >
-                  <FiCheck />
-                </IconButton>
-              </HStack>
-            </Card.Body>
-          </Card.Root>
+          <NewTodoCard
+            newTodoTitle={newTodoTitle}
+            setNewTodoTitle={setNewTodoTitle}
+            handleKeyDown={handleKeyDown}
+            setIsComposing={setIsComposing}
+            handleCancelAdd={handleCancelAdd}
+            handleAddTodo={handleAddTodo}
+            isCreating={isCreating}
+          />
         )}
 
         <HStack gap={4}>
