@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Container,
-  Heading,
-  LinkBox,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Container, Heading, Text, VStack } from "@chakra-ui/react";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +11,7 @@ export default function Home() {
   };
 
   const goToShowPage = () => {
-    router.push("/show");
+    router.push("/todos");
   };
 
   return (
