@@ -30,6 +30,7 @@ const ShowPage = () => {
     goToPreviousPage,
     fetchTodos,
     deleteTodo,
+    toggleTodo,
     isFetching,
     isCreating,
     deletingId,
@@ -81,7 +82,7 @@ const ShowPage = () => {
                       size="xs"
                       colorPalette={todo.is_done ? "green" : "gray"}
                       variant="subtle"
-                      onClick={() => {}}
+                      onClick={() => toggleTodo(todo.id)}
                     >
                       {todo.is_done ? "完了" : "未完了"}
                     </Button>

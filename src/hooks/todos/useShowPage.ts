@@ -89,6 +89,25 @@ export const useShowPage = () => {
     }
   };
 
+  const toggleTodo = async (id: number) => {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+
+    try {
+      const updatedTodo = await todoClient.updateTodo(id, {
+        is_done: !todo.is_done,
+      });
+      setTodos((prevTodos) =>
+        prevTodos.map((t) => (t.id === id ? updatedTodo : t)),
+      );
+    } catch (err) {
+      toaster.error({
+        title: "更新失敗",
+        description: "Todoの更新に失敗しました",
+      });
+    }
+  };
+
   // フォーム関連のハンドラー
   const handleAddTodo = async () => {
     if (newTodoTitle.trim()) {
@@ -134,6 +153,7 @@ export const useShowPage = () => {
     fetchTodos,
     deleteTodo,
     createTodo,
+    toggleTodo,
     // 個別のローディング状態
     isFetching,
     isCreating,
