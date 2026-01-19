@@ -13,6 +13,8 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useShowPage } from "@/hooks/todos/useShowPage";
+import { useTodoOperations } from "@/hooks/todos/useTodoOperations";
+import { useTodoForm } from "@/hooks/todos/useTodoForm";
 import {
   FiEdit,
   FiPlus,
@@ -23,17 +25,22 @@ import {
 } from "react-icons/fi";
 
 const ShowPage = () => {
+  const { goToPreviousPage } = useShowPage();
+
   const {
     todos,
     loading,
     error,
-    goToPreviousPage,
-    fetchTodos,
-    deleteTodo,
-    toggleTodo,
     isFetching,
     isCreating,
     deletingId,
+    fetchTodos,
+    createTodo,
+    deleteTodo,
+    toggleTodo,
+  } = useTodoOperations();
+
+  const {
     isAdding,
     setIsAdding,
     newTodoTitle,
@@ -42,7 +49,7 @@ const ShowPage = () => {
     handleAddTodo,
     handleCancelAdd,
     handleKeyDown,
-  } = useShowPage();
+  } = useTodoForm(createTodo);
 
   if (loading) {
     return (
