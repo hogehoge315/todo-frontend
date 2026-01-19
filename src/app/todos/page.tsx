@@ -7,32 +7,32 @@ import {
   Spinner,
   Button,
   HStack,
-  IconButton,
-  Card,
-  Box,
-  Input,
 } from "@chakra-ui/react";
 import { useShowPage } from "@/hooks/todos/useShowPage";
-import {
-  FiEdit,
-  FiPlus,
-  FiRotateCw,
-  FiTrash2,
-  FiX,
-  FiCheck,
-} from "react-icons/fi";
+import { useTodoOperations } from "@/hooks/todos/useTodoOperations";
+import { useTodoForm, useTodoEditForm } from "@/hooks/todos/useTodoForm";
+import { NewTodoCard } from "@/components/features/todos/NewTodoCard";
+import { EditTodoCard } from "@/components/features/todos/EditTodoCard";
+import { TodoCard } from "@/components/features/todos/TodoCard";
+import { FiPlus } from "react-icons/fi";
 
 const ShowPage = () => {
+  const { goToPreviousPage } = useShowPage();
+
   const {
     todos,
     loading,
     error,
-    goToPreviousPage,
-    fetchTodos,
-    deleteTodo,
-    isFetching,
     isCreating,
+    isUpdating,
     deletingId,
+    createTodo,
+    deleteTodo,
+    toggleTodo,
+    updateTodo,
+  } = useTodoOperations();
+
+  const {
     isAdding,
     setIsAdding,
     newTodoTitle,
@@ -41,7 +41,18 @@ const ShowPage = () => {
     handleAddTodo,
     handleCancelAdd,
     handleKeyDown,
-  } = useShowPage();
+  } = useTodoForm(createTodo);
+
+  const {
+    editingId,
+    editTodoTitle,
+    setEditTodoTitle,
+    setIsComposing: setIsEditComposing,
+    startEdit,
+    handleUpdateTodo,
+    handleCancelEdit,
+    handleKeyDown: handleEditKeyDown,
+  } = useTodoEditForm(updateTodo);
 
   if (loading) {
     return (
@@ -73,84 +84,45 @@ const ShowPage = () => {
           <Text color="gray.500">Todoが見つかりません。</Text>
         ) : (
           <VStack gap={3}>
-            {todos.map((todo) => (
-              <Card.Root key={todo.id} w="full" variant="outline">
-                <Card.Body p={4}>
-                  <HStack w="full" align="center">
-                    <Button
-                      size="xs"
-                      colorPalette={todo.is_done ? "green" : "gray"}
-                      variant="subtle"
-                      onClick={() => {}}
-                    >
-                      {todo.is_done ? "完了" : "未完了"}
-                    </Button>
-                    <Text
-                      flex="1"
-                      fontSize="lg"
-                      textDecoration={todo.is_done ? "line-through" : "none"}
-                    >
-                      {todo.title}
-                    </Text>
-                    <IconButton
-                      onClick={() => {}}
-                      variant="subtle"
-                      colorPalette="gray"
-                    >
-                      <FiEdit />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => deleteTodo(todo.id)}
-                      variant="plain"
-                      colorPalette="red"
-                      disabled={deletingId === todo.id}
-                      loading={deletingId === todo.id}
-                    >
-                      <FiTrash2 />
-                    </IconButton>
-                  </HStack>
-                </Card.Body>
-              </Card.Root>
-            ))}
+            {todos.map((todo) =>
+              editingId === todo.id ? (
+                <EditTodoCard
+                  key={todo.id}
+                  editTodoTitle={editTodoTitle}
+                  setEditTodoTitle={setEditTodoTitle}
+                  handleKeyDown={handleEditKeyDown}
+                  setIsComposing={setIsEditComposing}
+                  handleCancelEdit={handleCancelEdit}
+                  handleUpdateTodo={handleUpdateTodo}
+                  isUpdating={isUpdating}
+                />
+              ) : (
+                <TodoCard
+                  key={todo.id}
+                  todo={todo}
+                  toggleTodo={toggleTodo}
+                  deleteTodo={deleteTodo}
+                  deletingId={deletingId}
+                  onEdit={startEdit}
+                />
+              ),
+            )}
           </VStack>
         )}
 
         {isAdding && (
-          <Card.Root w="full" variant="outline" colorPalette="green">
-            <Card.Body p={4}>
-              <HStack w="full" align="center">
-                <Input
-                  flex="1"
-                  placeholder="新しいTodoを入力..."
-                  value={newTodoTitle}
-                  onChange={(e) => setNewTodoTitle(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onCompositionStart={() => setIsComposing(true)}
-                  onCompositionEnd={() => setIsComposing(false)}
-                  autoFocus
-                />
-                <IconButton
-                  onClick={handleCancelAdd}
-                  variant="subtle"
-                  colorPalette="gray"
-                >
-                  <FiX />
-                </IconButton>
-                <IconButton
-                  onClick={handleAddTodo}
-                  variant="subtle"
-                  colorPalette="green"
-                  disabled={!newTodoTitle.trim() || isCreating}
-                  loading={isCreating}
-                >
-                  <FiCheck />
-                </IconButton>
-              </HStack>
-            </Card.Body>
-          </Card.Root>
+          <NewTodoCard
+            newTodoTitle={newTodoTitle}
+            setNewTodoTitle={setNewTodoTitle}
+            handleKeyDown={handleKeyDown}
+            setIsComposing={setIsComposing}
+            handleCancelAdd={handleCancelAdd}
+            handleAddTodo={handleAddTodo}
+            isCreating={isCreating}
+          />
         )}
 
-        <HStack gap={4}>
+        <HStack gap={4} justify="space-between">
           <Button
             variant="subtle"
             colorPalette="green"
@@ -160,18 +132,8 @@ const ShowPage = () => {
             <FiPlus />
             追加
           </Button>
-          <Box flex="1" />
           <Button variant="subtle" onClick={goToPreviousPage}>
             戻る
-          </Button>
-          <Button
-            variant="subtle"
-            onClick={fetchTodos}
-            colorPalette="blue"
-            loading={isFetching}
-          >
-            <FiRotateCw />
-            {isFetching ? "更新中..." : "更新"}
           </Button>
         </HStack>
       </VStack>

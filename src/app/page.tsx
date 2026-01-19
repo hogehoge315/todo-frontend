@@ -28,17 +28,17 @@ export default function Home() {
           Todoアプリへようこそ
         </Heading>
         <Text fontSize="xl" textAlign="center">
-          新しいTodoアイテムを作成して始めましょう。
+          工事中
         </Text>
         <Button onClick={goToCreatePage} colorScheme="teal" size="lg">
           作成ページへ
         </Button>
 
         <Text fontSize="xl" textAlign="center">
-          Todoアイテムを表示します。
+          Todoアプリを表示します。
         </Text>
         <Button onClick={goToShowPage} colorScheme="teal" size="lg">
-          表示ページへ
+          Todoアプリページへ
         </Button>
         <ColorModeButton />
       </VStack>
