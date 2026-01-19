@@ -18,7 +18,7 @@ export default function Home() {
   };
 
   const goToShowPage = () => {
-    router.push("/show");
+    router.push("/todos");
   };
 
   return (
