@@ -12,6 +12,7 @@ export const useTodoOperations = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchTodos = async () => {
@@ -98,6 +99,30 @@ export const useTodoOperations = () => {
     }
   };
 
+  const updateTodo = async (id: number, title: string) => {
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const updatedTodo = await todoClient.updateTodo(id, { title });
+      setTodos((prevTodos) =>
+        prevTodos.map((t) => (t.id === id ? updatedTodo : t)),
+      );
+
+      toaster.success({
+        title: "更新完了",
+        description: "Todoを更新しました",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      toaster.error({
+        title: "更新失敗",
+        description: "Todoの更新に失敗しました",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
@@ -119,10 +144,12 @@ export const useTodoOperations = () => {
     error,
     isFetching,
     isCreating,
+    isUpdating,
     deletingId,
     fetchTodos,
     createTodo,
     deleteTodo,
     toggleTodo,
+    updateTodo,
   };
 };

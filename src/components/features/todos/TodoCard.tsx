@@ -7,7 +7,7 @@ interface TodoCardProps {
   toggleTodo: (id: number) => void;
   deleteTodo: (id: number) => void;
   deletingId: number | null;
-  onEdit?: () => void;
+  onEdit: (id: number, title: string) => void;
 }
 
 export const TodoCard = ({
@@ -37,7 +37,7 @@ export const TodoCard = ({
             {todo.title}
           </Text>
           <IconButton
-            onClick={onEdit || (() => {})}
+            onClick={() => onEdit(todo.id, todo.title)}
             variant="subtle"
             colorPalette="gray"
           >

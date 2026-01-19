@@ -7,14 +7,14 @@ import {
   Spinner,
   Button,
   HStack,
-  Box,
 } from "@chakra-ui/react";
 import { useShowPage } from "@/hooks/todos/useShowPage";
 import { useTodoOperations } from "@/hooks/todos/useTodoOperations";
-import { useTodoForm } from "@/hooks/todos/useTodoForm";
+import { useTodoForm, useTodoEditForm } from "@/hooks/todos/useTodoForm";
 import { NewTodoCard } from "@/components/features/todos/NewTodoCard";
+import { EditTodoCard } from "@/components/features/todos/EditTodoCard";
 import { TodoCard } from "@/components/features/todos/TodoCard";
-import { FiPlus, FiRotateCw } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 
 const ShowPage = () => {
   const { goToPreviousPage } = useShowPage();
@@ -23,13 +23,13 @@ const ShowPage = () => {
     todos,
     loading,
     error,
-    isFetching,
     isCreating,
+    isUpdating,
     deletingId,
-    fetchTodos,
     createTodo,
     deleteTodo,
     toggleTodo,
+    updateTodo,
   } = useTodoOperations();
 
   const {
@@ -42,6 +42,17 @@ const ShowPage = () => {
     handleCancelAdd,
     handleKeyDown,
   } = useTodoForm(createTodo);
+
+  const {
+    editingId,
+    editTodoTitle,
+    setEditTodoTitle,
+    setIsComposing: setIsEditComposing,
+    startEdit,
+    handleUpdateTodo,
+    handleCancelEdit,
+    handleKeyDown: handleEditKeyDown,
+  } = useTodoEditForm(updateTodo);
 
   if (loading) {
     return (
@@ -73,15 +84,29 @@ const ShowPage = () => {
           <Text color="gray.500">Todoが見つかりません。</Text>
         ) : (
           <VStack gap={3}>
-            {todos.map((todo) => (
-              <TodoCard
-                key={todo.id}
-                todo={todo}
-                toggleTodo={toggleTodo}
-                deleteTodo={deleteTodo}
-                deletingId={deletingId}
-              />
-            ))}
+            {todos.map((todo) =>
+              editingId === todo.id ? (
+                <EditTodoCard
+                  key={todo.id}
+                  editTodoTitle={editTodoTitle}
+                  setEditTodoTitle={setEditTodoTitle}
+                  handleKeyDown={handleEditKeyDown}
+                  setIsComposing={setIsEditComposing}
+                  handleCancelEdit={handleCancelEdit}
+                  handleUpdateTodo={handleUpdateTodo}
+                  isUpdating={isUpdating}
+                />
+              ) : (
+                <TodoCard
+                  key={todo.id}
+                  todo={todo}
+                  toggleTodo={toggleTodo}
+                  deleteTodo={deleteTodo}
+                  deletingId={deletingId}
+                  onEdit={startEdit}
+                />
+              ),
+            )}
           </VStack>
         )}
 
@@ -97,7 +122,7 @@ const ShowPage = () => {
           />
         )}
 
-        <HStack gap={4}>
+        <HStack gap={4} justify="space-between">
           <Button
             variant="subtle"
             colorPalette="green"
@@ -107,18 +132,8 @@ const ShowPage = () => {
             <FiPlus />
             追加
           </Button>
-          <Box flex="1" />
           <Button variant="subtle" onClick={goToPreviousPage}>
             戻る
-          </Button>
-          <Button
-            variant="subtle"
-            onClick={fetchTodos}
-            colorPalette="blue"
-            loading={isFetching}
-          >
-            <FiRotateCw />
-            {isFetching ? "更新中..." : "更新"}
           </Button>
         </HStack>
       </VStack>
