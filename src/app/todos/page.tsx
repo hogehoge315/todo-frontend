@@ -30,11 +30,13 @@ const ShowPage = () => {
     goToPreviousPage,
     fetchTodos,
     deleteTodo,
+    isFetching,
+    isCreating,
+    deletingId,
     isAdding,
     setIsAdding,
     newTodoTitle,
     setNewTodoTitle,
-    isComposing,
     setIsComposing,
     handleAddTodo,
     handleCancelAdd,
@@ -101,6 +103,8 @@ const ShowPage = () => {
                       onClick={() => deleteTodo(todo.id)}
                       variant="plain"
                       colorPalette="red"
+                      disabled={deletingId === todo.id}
+                      loading={deletingId === todo.id}
                     >
                       <FiTrash2 />
                     </IconButton>
@@ -136,7 +140,8 @@ const ShowPage = () => {
                   onClick={handleAddTodo}
                   variant="subtle"
                   colorPalette="green"
-                  disabled={!newTodoTitle.trim()}
+                  disabled={!newTodoTitle.trim() || isCreating}
+                  loading={isCreating}
                 >
                   <FiCheck />
                 </IconButton>
@@ -163,10 +168,10 @@ const ShowPage = () => {
             variant="subtle"
             onClick={fetchTodos}
             colorPalette="blue"
-            disabled={loading}
+            loading={isFetching}
           >
             <FiRotateCw />
-            {loading ? "更新中..." : "更新"}
+            {isFetching ? "更新中..." : "更新"}
           </Button>
         </HStack>
       </VStack>

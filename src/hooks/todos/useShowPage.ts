@@ -10,6 +10,11 @@ export const useShowPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 個別の操作用ローディング状態
+  const [isFetching, setIsFetching] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
   // フォーム関連の状態
   const [isAdding, setIsAdding] = useState(false);
   const [newTodoTitle, setNewTodoTitle] = useState("");
@@ -20,7 +25,7 @@ export const useShowPage = () => {
   };
 
   const fetchTodos = async () => {
-    setLoading(true);
+    setIsFetching(true);
     setError(null);
     try {
       const data = await todoClient.fetchTodos();
@@ -37,12 +42,12 @@ export const useShowPage = () => {
         description: "Todo一覧の取得に失敗しました",
       });
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
   const createTodo = async (title: string) => {
-    setLoading(true);
+    setIsCreating(true);
     setError(null);
     try {
       const newTodo = await todoClient.createTodo(title);
@@ -59,12 +64,12 @@ export const useShowPage = () => {
         description: "Todoの作成に失敗しました",
       });
     } finally {
-      setLoading(false);
+      setIsCreating(false);
     }
   };
 
   const deleteTodo = async (id: number) => {
-    setLoading(true);
+    setDeletingId(id);
     setError(null);
     try {
       await todoClient.deleteTodo(id);
@@ -80,7 +85,7 @@ export const useShowPage = () => {
         description: "Todoの削除に失敗しました",
       });
     } finally {
-      setLoading(false);
+      setDeletingId(null);
     }
   };
 
@@ -107,7 +112,18 @@ export const useShowPage = () => {
   };
 
   useEffect(() => {
-    fetchTodos();
+    const loadInitialData = async () => {
+      setLoading(true);
+      try {
+        const data = await todoClient.fetchTodos();
+        setTodos(data.items);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadInitialData();
   }, []);
 
   return {
@@ -118,6 +134,10 @@ export const useShowPage = () => {
     fetchTodos,
     deleteTodo,
     createTodo,
+    // 個別のローディング状態
+    isFetching,
+    isCreating,
+    deletingId,
     // フォーム関連
     isAdding,
     setIsAdding,
